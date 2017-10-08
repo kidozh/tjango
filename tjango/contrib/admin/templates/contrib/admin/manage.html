@@ -1,0 +1,717 @@
+{% extends 'manageBase.html' %}
+
+{% block webtitle %}管理{% end %}
+
+{% block header %}
+<link href="{{ static_url('admin/css/light-custome.css') }}" rel="stylesheet">
+
+<!-- chart.js -->
+<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.js"></script>
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.common.js"></script>-->
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/extension/dataTool.min.js"></script>
+<script src="//cdn.bootcss.com/echarts/3.3.1/extension/bmap.min.js"></script>-->
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.simple.min.js"></script>-->
+
+<!-- vue -->
+<script src="//cdn.bootcss.com/vue/2.1.4/vue.js"></script>
+
+
+{% end %}
+
+{% block content %}
+
+{% include 'cookieNotification.html' %}
+
+
+<div class="content-wrapper">
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- condition -->
+            <div class="content-header">
+                <h1>
+                    服务器概况
+                    <small>Current version 2.3.0</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="{{  reverse_url('contrib.admin.view.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
+                    <li class="active">总览</li>
+                </ol>
+            </div>
+
+            <!-- monitor -->
+            <div class="content body" >
+                <div class="row" id="overview-info">
+                    <h1 class="text-center">TOC + </h1>
+
+                    <script>
+                        $(document).ready(function() {
+                            setTimeout(function() {
+                                toastr.options = {
+                                    closeButton: true,
+                                    progressBar: true,
+                                    showMethod: 'slideDown',
+                                    timeOut: 10000
+                                };
+                                if (overView.websocket_support){
+                                    toastr.success('WebSocket技术让查询更加便捷！','WebSocket支持');
+                                }
+                                else{
+                                    toastr.warning('现在通过HTTP/HTTPS来通信，我们强烈建议您使用支持WebSocket技术的浏览器！','WebSocket不支持');
+                                }
+
+
+                            }, 1300)}
+                            );
+
+                    </script>
+
+                    <!--line chart-->
+                    <div class="col-md-6">
+                        <!-- LINE CHART -->
+                        <div class="box box-info">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">CPU</h3>
+
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="chart">
+                                    <div id="main" style="width: 100%;">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- /.box -->
+                    </div>
+
+                    <!--line chart-->
+                    <div class="col-md-6">
+                        <!-- LINE CHART -->
+                        <div class="box box-danger">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">内存</h3>
+
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                <div class="chart">
+                                    <div id="history" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <!-- /.box -->
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <!-- Apply any bg-* class to to the info-box to color it -->
+                            <div class="info-box bg-red">
+                                <span class="info-box-icon"><i class="fa fa-ship"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">CPU</span>
+                                    <span class="info-box-number">{% raw '{{ usedCPURate }}' %}%</span>
+                                    <!-- The progress section is optional -->
+                                    <div class="progress">
+                                        <div class="progress-bar" v-bind:style="{width:usedCPURate+'%'}"></div>
+                                    </div>
+                                    <span class="progress-description">
+                                        这会显示您的CPU占用情况
+                                    </span>
+
+                                </div><!-- /.info-box-content -->
+                            </div><!-- /.info-box -->
+                        </div>
+
+                        <!--memory -->
+                        <div class="col-md-4">
+                            <!-- Apply any bg-* class to to the info-box to color it -->
+                            <div class="info-box bg-aqua">
+                                <span class="info-box-icon"><i class="fa fa-cloud"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">内存</span>
+                                    <span class="info-box-number">{% raw '{{ mem_usage }}' %}%</span>
+                                    <!-- The progress section is optional -->
+                                    <div class="progress">
+                                        <div class="progress-bar" v-bind:style="{width:mem_usage+'%'}"></div>
+                                    </div>
+                                    <span class="progress-description">
+                                        这会显示您内存的占用情况
+                                    </span>
+
+                                </div><!-- /.info-box-content -->
+                            </div><!-- /.info-box -->
+                        </div>
+
+                        <!--memory -->
+                        <div class="col-md-4">
+                            <!-- Apply any bg-* class to to the info-box to color it -->
+                            <div class="info-box bg-yellow">
+                                <span class="info-box-icon"><i class="fa fa-wifi"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">发送的字节数</span>
+                                    <span class="info-box-number">{% raw '{{ ntw_sent }}' %}MB</span>
+                                    <span class="info-box-text"> 收到的字节数</span>
+                                    <span class="info-box-number">{% raw '{{ ntw_recv }}' %}MB</span>
+
+
+                                </div><!-- /.info-box-content -->
+                            </div><!-- /.info-box -->
+                        </div>
+
+                    </div>
+
+                    <!-- for collapse -->
+                    <div class="col-md-12">
+                        <!-- accordion-->
+                        <div id="accordion" role="tablist" aria-multiselectable="true">
+                            <!-- first panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingCPU">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseCPU" aria-expanded="true" aria-controls="collapseCPU">
+                                            CPU信息<i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseCPU" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingCPU">
+                                    <!-- for CPU panel -->
+                                    <ul class="list-group">
+                                        <li class="list-group-item">逻辑核心 <span class="pull-right label label-pill label-info">{{ logicalCPU }}</span></li>
+                                        <li class="list-group-item">物理核心 <span class="pull-right label label-pill label-success">{{ physicsCPU }}</span></li>
+                                        <li class="list-group-item">使用情况 <span class="pull-right label label-pill label-danger">{% raw '{{ usedCPURate }}' %}%</span></li>
+                                    </ul>
+
+                                    <!-- for CPU Progress-->
+                                    <div class="progress" id="">
+                                        <progress v-bind:value="usedCPURate" class=" progress-bar progress-danger" max="100"></progress>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <!-- second panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingMem">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseMem" aria-expanded="true" aria-controls="collapseMem">
+                                            内存信息<i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseMem" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingMem">
+                                    <!-- for memory panel -->
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">可用内存 <span class="pull-right label label-pill label-info">{% raw '{{ mem_available }}' %}MB</span></li>
+                                        <li class="list-group-item">总内存  <span class="pull-right label label-pill label-success">{% raw '{{ mem_total }}' %}MB</span></li>
+                                        <li class="list-group-item">使用情况 <span class="pull-right label label-pill label-danger">{% raw '{{ mem_usage }}' %}%</span></li>
+                                    </ul>
+
+
+                                    <div class="progress">
+                                        <progress v-bind:value="mem_usage" class=" progress-bar progress-danger" max="100">{% raw '{{ mem_usage }}' %}</progress>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <!-- third panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingNet">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseNet" aria-expanded="true" aria-controls="collapseNet">
+                                            网络信息<i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseNet" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNet">
+                                    <!-- for network panel -->
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><span class="fa fa-chevron-up  "></span>发送的字节数<span class="pull-right label label-pill label-info">{% raw '{{ ntw_sent }}' %}MB</span></li>
+                                        <li class="list-group-item"><span class="fa fa-chevron-down"></span> 收到的字节数<span class="pull-right label label-pill label-success">{% raw '{{ ntw_recv }}' %}MB</span></li>
+                                    </ul>
+
+
+                                </div>
+                            </div>
+                            <!-- end -->
+
+                            <!-- forth panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingSys">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseSys" aria-expanded="true" aria-controls="collapseSys">
+                                            系统信息<i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseSys" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingSys">
+                                    <!-- sys Info -->
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">操作系统 <span class="pull-right">{{ system }}</span></li>
+                                        <li class="list-group-item">用户名 <span class="pull-right">{{ node }}</span></li>
+                                        <li class="list-group-item">OS 版本 <span class="pull-right">{{ release }}</span></li>
+                                        <li class="list-group-item">发行版本 <span class="pull-right">{{ version }}</span></li>
+                                        <li class="list-group-item">机器码 <span class="pull-right">{{ machine }}</span></li>
+                                        <li class="list-group-item">处理器名称 <span class="pull-right">{{ processor }}</span></li>
+                                    </ul>
+
+
+                                </div>
+                            </div>
+                            <!-- end -->
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- for ngnix setting-->
+                <div class="row" id="admin-statistics">
+                    <h2><span class="fa fa-line-chart"></span> 统计站点</h2>
+                    <hr/>
+                    {% if logFileExist %}
+                    {# log file opened #}
+                    <div class="col-md-12">
+                        <p class="text-justify">Tornado 正在正常地记录日志文件</p>
+
+                    </div>
+                    {% else %}
+                    <div class="col-md-12">
+                        <div class="alert alert-warning">
+                            <p class="text-justify">需要开启<strong>Tornado</strong>的日志记录 </p>
+                        </div>
+
+                        <blockquote>
+                            <h3>如何开启?</h3>
+                            <p>请在<code>setting.py</code>之中开启<code>LOGFILE</code>并且指定输出的日志文件。比如</p>
+                            <pre>LOGFILE = 'log/site.log'</pre>
+                            <p>重启服务器后即可使用这个功能。</p>
+                        </blockquote>
+                    </div>
+                    {% end %}
+                    <div class="col-md-6">
+                        <h6 class="sub-header text-info"><span class="fa fa-info-circle"></span> 访问量最多的站点</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="sub-header text-danger">出错的站点</h6>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% end %}
+
+{% block footerJS %}
+<script src="{{ static_url('admin/js/manage/manageView.js') }}"></script>
+
+
+
+<script type="application/javascript">
+    var myChart = echarts.init(document.getElementById('main'));
+    function getHardwareInfo(){
+        xhr = $.ajax({
+            url:"{{ reverse_url('contrib.admin.view.statusAPIHandler') }}",
+            // data which api server can accept
+            data:{
+
+                // no parameter needed
+            },
+            dataType:"json",
+            type:"GET",
+            cache: false,
+            success: function (data) {
+                // distribute value
+                overView.usedCPURate = data.cpu;
+                overView.mem_usage = data.memory;
+                overView.mem_available = parseInt(overView.mem_total * overView.mem_usage /100);
+                overView.ntw_sent = parseInt(data.net_sent/1024/1024);
+                overView.ntw_recv = parseInt(data.net_recv/1024/1024);
+                // draw pic
+                option.series[0].data[0].value = data.cpu;
+                option.series[0].data[1].value = 100-data.cpu;
+                option.series[1].data[0].value = data.memory;
+                option.series[1].data[1].value = 100-data.memory;
+                myChart.setOption(option);
+                //option.series[0].data[0].value = data.cpu.toFixed(2);
+                myChart.setOption(option, true);
+                // render history output
+                historyOption.series[0].data.push(genHistoryData(data.cpu,'CPU'));
+                historyOption.series[1].data.push(genHistoryData(data.memory,'内存'));
+                historyChart.setOption(historyOption,true);
+                //console.log(historyOption.series);
+
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                console.error(xhr.status);
+                console.error(thrownError);
+            }
+        });
+    }
+
+    /*
+     * for websocket
+     * */
+    if (location.protocol == 'https:'){
+        // use safer protocol
+        var wsProtocol = 'wss:'
+    }
+    else{
+        var wsProtocol = 'ws:'
+    }
+    var statusURL = wsProtocol+'//'+location.hostname+':'+location.port+'{{ reverse_url('contrib.admin.view.statusWebsocketAPIHandler') }}';
+    var statusWS = new WebSocket(statusURL);
+
+    statusWS.onerror=function(event){
+        setTimeout(function() {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                showMethod: 'slideDown',
+                timeOut: 10000
+            };
+            toastr.error('请刷新网页试试','无法连接到Websocket服务器');
+        }, 1300);
+        console.error("Error: " + event);
+    };
+
+    statusWS.onclose = function(){
+        setTimeout(function() {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                showMethod: 'slideDown',
+                timeOut: 10000
+            };
+            toastr.warning('您已经脱离了Websocket的服务范围，请刷新重新连接至Websocket服务器！','Websocket停止服务');
+        }, 1300);
+    console.log('Disconnected');
+    };
+
+    statusWS.onopen = function(){
+        // auth
+        setTimeout(function() {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                showMethod: 'slideDown',
+                timeOut: 10000
+            };
+            toastr.success('第一份信息已经由您的浏览器君发出','开始连接至Websocket服务器');
+        }, 1300);
+        statusWS.send('1');
+    };
+
+    statusWS.onmessage = function(event){
+        data = JSON.parse(event.data);
+        // distribute value
+        overView.usedCPURate = data.cpu;
+        overView.mem_usage = data.memory;
+        overView.mem_available = parseInt(overView.mem_total * overView.mem_usage /100);
+        overView.ntw_sent = parseInt(data.net_sent/1024/1024);
+        overView.ntw_recv = parseInt(data.net_recv/1024/1024);
+        // draw pic
+        option.series[0].data[0].value = data.cpu;
+        option.series[0].data[1].value = 100-data.cpu;
+        option.series[1].data[0].value = data.memory;
+        option.series[1].data[1].value = 100-data.memory;
+        myChart.setOption(option);
+        //option.series[0].data[0].value = data.cpu.toFixed(2);
+        myChart.setOption(option, true);
+        // render history output
+        historyOption.series[0].data.push(genHistoryData(data.cpu,'CPU'));
+        historyOption.series[1].data.push(genHistoryData(data.memory,'内存'));
+        historyChart.setOption(historyOption);
+    };
+
+    function getHardWareInfoByWS(){
+        // just to send information
+        if (statusWS.readyState !=1){
+            setTimeout(function() {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 10000
+                };
+                toastr.error('请刷新网页试试，Websocket处于关闭状态。','无法连接到Websocket服务器');
+            }, 1300);
+        }
+        try{
+            statusWS.send('1');
+        } catch (e){
+
+            console.log(e);
+        }
+    }
+
+    function isSupWS(){
+        return !!window.WebSocket && window.WebSocket.prototype.send;
+    }
+    /*
+     * end websocket
+     * */
+
+
+
+    // component
+    var overView = new Vue({
+        el:'#overview-info',
+        data:{
+            usedCPURate:'{{ usedCPURate }}',
+            mem_available:'{{ mem.available/1024/1024 }}',
+            mem_total:'{{ mem.total/1024/1024 }}',
+            mem_usage:'{{ mem.available * 100/mem.total }}',
+            ntw_sent:'{{ network.bytes_sent/1024/1024 }}',
+            ntw_recv:'{{ network.bytes_recv/1024/1024 }}',
+
+        },
+        watch:{
+            usedCPURate:function(val){
+                // redraw echart picture
+                var value = val;
+
+            }
+        },
+        computed :{
+            websocket_support:function(){
+                return isSupWS();
+            },
+            websocket_unsupport:function() {
+                return !this.websocket_support;
+
+            }
+        }
+    });
+
+    // draw a picture
+    var dataStyle = {
+        normal: {
+            label: {show:false},
+            labelLine: {show:false},
+            shadowBlur: 40,
+            shadowColor: 'rgba(40, 40, 40, 0.5)',
+        }
+    };
+    var placeHolderStyle = {
+        normal : {
+            color: 'rgba(0,0,0,0)',
+            label: {show:false},
+            labelLine: {show:false}
+        },
+        emphasis : {
+            color: 'rgba(0,0,0,0)'
+        }
+    };
+    option = {
+        // backgroundColor: '#ffffff',
+        color: ['#00AD7C', '#52D681','#B5FF7D','#FFF8B5'],
+        tooltip : {
+            show: true,
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            itemGap:12,
+            data:['CPU','内存']
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        series : [
+            {
+                name:'CPU使用率',
+                type:'pie',
+                clockWise:false,
+                radius : ['80%','90%'],
+                itemStyle : dataStyle,
+                hoverAnimation: false,
+
+                data:[
+                    {
+                        value:overView.usedCPURate,
+                        name:'CPU'
+                    },
+                    {
+                        value:100-overView.usedCPURate,
+                        name:'invisible',
+                        itemStyle : placeHolderStyle
+                    }
+
+                ]
+            },
+            {
+                name:'内存',
+                type:'pie',
+                clockWise:false,
+                radius : ['70%', '80%'],
+                itemStyle : dataStyle,
+                hoverAnimation: false,
+
+                data:[
+                    {
+                        value:overView.mem_usage,
+                        name:'内存'
+                    },
+                    {
+                        value:100-overView.mem_usage,
+                        name:'invisible',
+                        itemStyle : placeHolderStyle
+                    }
+                ]
+            }
+        ]
+    };
+    // for history render data
+    var historyCPUData = [genHistoryData(overView.usedCPURate,'CPU')];
+    var historyMemData = [genHistoryData(overView.mem_usage,'内存')];
+    var now = new Date();
+    /*var historyDom = document.getElementById('history');
+     var historyChart = echarts.init(historyDom);*/
+    var historyOption = {
+        title:{
+            text:'CPU和内存使用情况',
+            subtext:'自'+now.toString()+'之时间'
+        },
+        tooltip:{
+            trigger:'axis',
+            formatter:function (params){
+                param = params[0];
+                var date = new Date(param.name);
+                var infoString = '';
+                infoString += date.toLocaleString();
+                for (var i = 0;i<params.length;i++){
+                    param = params[i];
+                    infoString += '<br/> * '+param.value[1];
+                }
+
+                return infoString;
+            },
+            axisPointer:{
+                animation:false
+            }
+        },
+        legend:{
+            data:['CPU','内存']
+        },
+        xAxis:{
+            type:'time',
+            splitLine:{
+                show:false
+            }
+        },
+        yAxis:{
+            type:'value',
+            splitLine:{
+                show:false
+            }
+        },
+        dataZoom: [
+            {   // 这个dataZoom组件，默认控制x轴。
+                type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+                start: 0,      // 左边在 0% 的位置。
+                end: 100         // 右边在 100% 的位置。
+            },
+            {   // 这个dataZoom组件，也控制x轴。
+                type: 'inside', // 这个 dataZoom 组件是 inside 型 dataZoom 组件
+                start: 0,      // 左边在 0% 的位置。
+                end: 100       // 右边在 80% 的位置。
+            },
+            {
+                type: 'slider',
+                yAxisIndex: 0,
+                start: 0,
+                end: 100
+            },
+            {
+                type: 'inside',
+                yAxisIndex: 0,
+                start: 0,
+                end: 100
+            }
+        ],
+        series:[
+            {
+                name:'CPU',
+                type:'line',
+                showSymbol:false,
+                data:historyCPUData
+            },
+            {
+                name:'内存',
+                type:'line',
+                showSymbol:false,
+                data:historyMemData
+            }
+        ]
+    };
+
+    function genHistoryData(val,name){
+        var now = new Date();
+
+        return {
+            value:[
+                now,
+                val
+            ],
+            name:now.toString()
+        }
+
+    }
+
+    $(document).ready(function(){
+        if (option && typeof option == "object"){
+            var dom = document.getElementById('main');
+            dom.style.width = '100%';
+            dom.style.height = '30rem';
+            myChart = echarts.init(dom);
+
+            myChart.setOption(option,true);
+
+        }
+        if (historyOption && typeof historyOption == 'object'){
+            // for history chart.
+            historyDom = document.getElementById('history');
+            historyDom.style.width='100%';
+            historyDom.style.height = '30rem';
+            historyChart = echarts.init(historyDom);
+            historyChart.setOption(historyOption);
+        }
+
+        // myChart.setOption(option);
+        dynamicGetInfo();
+    });
+
+</script>
+{% end %}

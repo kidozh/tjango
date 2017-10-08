@@ -1,0 +1,347 @@
+{% extends 'manageBase.html' %}
+
+{% block webtitle %}管理{{ modelName }}{% end %}
+
+{% block header %}
+<link href="{{ static_url('admin/css/light-custome.css') }}" rel="stylesheet">
+
+<!-- chart.js -->
+<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.js"></script>
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.common.js"></script>-->
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/extension/dataTool.min.js"></script>
+<script src="//cdn.bootcss.com/echarts/3.3.1/extension/bmap.min.js"></script>-->
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.simple.min.js"></script>-->
+
+<!-- vue -->
+<script src="//cdn.bootcss.com/vue/2.1.4/vue.js"></script>
+
+<!-- font awesome -->
+<link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<!--dataTable-->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/af-2.1.3/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/cr-1.3.2/fc-3.2.2/fh-3.1.2/kt-2.2.0/r-2.1.0/rr-1.2.0/sc-1.4.2/se-1.2.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/af-2.1.3/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/cr-1.3.2/fc-3.2.2/fh-3.1.2/kt-2.2.0/r-2.1.0/rr-1.2.0/sc-1.4.2/se-1.2.0/datatables.min.js"></script>
+
+<!--<link href="//cdn.bootcss.com/datatables/1.10.13/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="//cdn.bootcss.com/datatables/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet">
+
+<script src="//cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.bootcss.com/datatables/1.10.13/js/dataTables.bootstrap.min.js"></script>-->
+{% end %}
+
+{% block content %}
+
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12">
+
+
+            <div class="content-header">
+                <h1>
+                    数据管理
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="{{  reverse_url('contrib.admin.view.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
+                    <li><a href="#"><i class="fa fa-server "></i> {{ package }}</a></li>
+                    <li class="active"><i class="fa fa-database "></i> {{ modelName }}</li>
+                </ol>
+            </div>
+
+
+            <div class="content body">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div class="box">
+                            <div class="box-header">
+                                <h3 class="box-title">模型 {{ modelName }} 于数据库中的数据
+                                    <small>一共 {{ total_record_cnt }} 条数据</small></h3>
+                            </div>
+                            <div class="box-body table-responsive ">
+
+
+                                <table class="table table-bordered" id="dataTable">
+                                    <thead>
+                                    <tr>
+                                        {# we should output PrimaryKey First #}
+                                        {% for (fieldName,instance) in  allValidField %}
+                                            {% set fieldClassName = type(instance).__name__  %}
+                                            {% if fieldClassName=='PrimaryKeyField' %}
+                                                 <th>{{ fieldName }}</th>
+                                                {% break %}
+                                            {% end %}
+
+                                        {% end %}
+
+                                        {% for (fieldName,instance) in  allValidField %}
+                                            {% set fieldClassName = type(instance).__name__  %}
+
+                                            {% if fieldClassName=='PrimaryKeyField' %}
+                                                {% continue %}
+                                            {% else %}
+                                                <th>{{ fieldName }}</th>
+                                            {% end %}
+                                        {% end %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for foo in query %}
+                                    <tr>
+                                        {% for attrName in [fo for (fo,instance) in  allValidField ] %}
+                                        <td>{{ getattr(foo,attrName) }} </td>
+                                        {% end %}
+                                    </tr>
+                                    {% end %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="small-box bg-aqua">
+                            <div class="inner">
+                                <h3>新增</h3>
+                                <p>新增一条记录</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-user-plus"></i>
+                            </div>
+                            <a href="{{ reverse_url('contrib.admin.view.appModelAddManager',modelName) }}" class="small-box-footer">
+                                新增
+                                <i class="fa fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3" id="changeDataBox">
+                        <div class="small-box" v-bind:class="{ 'bg-green': selectOne,'bg-red':selectError }" >
+                            <div class="inner">
+                                <h3>修改</h3>
+                                <p>选择一条目后，修改条目内容</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-gears"></i>
+                            </div>
+
+                            <a v-if="selectOne" v-bind:href="url" class="small-box-footer">
+                                修改
+                                <i class="fa fa-arrow-circle-right"></i>
+                            </a>
+                            <a v-else href="#" class="small-box-footer" >
+                                请选择一条来修改
+                                <i class="fa fa-question"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3" id="deleteDataBox">
+                        <div class="small-box" v-bind:class="{ 'bg-green': selectOne,'bg-red':selectError }">
+                            <div class="inner">
+                                <h3>删除</h3>
+                                <p>删除一个列</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-close"></i>
+                            </div>
+                            <a v-if="selectOne" v-bind:href="url" class="small-box-footer">
+                                删除
+                                <i class="fa fa-arrow-circle-right"></i>
+                            </a>
+                            <a v-else href="#" class="small-box-footer" >
+                                请选择一条来修改
+                                <i class="fa fa-question"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="small-box bg-yellow">
+                            <div class="inner">
+                                <h3>功能</h3>
+                                <p>ADMIN自带功能</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-paper-plane"></i>
+                            </div>
+                            <a href="#" class="small-box-footer">
+                                目前不可用
+                                <i class="fa fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+</div>
+{% end %}
+
+{% block footerJS %}
+<script>
+    function getCookie(name) {
+        var c = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+        return c ? c[1] : undefined;
+    }
+
+    function addData(){
+        var data = {};
+        head = $('table thead tr th');
+        for (var i=0 ;i<head.length;i++){
+            data['columnsCustome['+i.toString()+'][name]'] = head[i].textContent ;
+            console.log(head[i].textContent);
+        }
+        data['_xsrf'] = getCookie('_xsrf');
+        return data;
+    }
+    var table ='';
+
+    $(document).ready(function() {
+
+
+        table = $('#dataTable').DataTable( {
+            select:true,
+            autoFill: true,
+            serverSide: true,
+            responsive: true,
+            "lengthChange": true,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            "paging":true,
+            bPaginate: true,
+            bLengthChange: true,
+            pagingType: "full_numbers",
+            ajax: {
+                url: '{{ reverse_url('contrib.admin.view.appModelApiManager',modelName) }}',
+                type: 'POST',
+                data:addData(),
+            },
+            language:{
+                url:'//cdn.datatables.net/plug-ins/1.10.13/i18n/Chinese.json',
+                buttons: {
+                    colvis: '选择显示的列',
+                    selectAll:'全选',
+                    selectNone:'全不选',
+                    csv:'导出为CSV',
+                    excel:'导出为Excel',
+                    pdf:'导出为PDF',
+                }
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                'selectAll',
+                'selectNone',
+                'csv',
+                'excel',
+                'pdf',
+                'colvis',
+                'pageLength'
+            ]
+
+        } );
+
+        table
+                .on( 'select', function ( e, dt, type, indexes ) {
+                    var rowData = table.rows( { selected: true } ).data().toArray();
+                    var selectedRowCnt = rowData.length;
+                    console.log(selectedRowCnt);
+                    rowData = table.rows( { selected: true } ).data().toArray();
+                    // return the first one , usually ID
+
+                    if(selectedRowCnt == 1){
+                        changeDataBox.selectOne = true;
+                        deleteDataBox.selectOne = true;
+                        changeDataBox.selectID =  rowData[0][0];
+                        deleteDataBox.selectID =  rowData[0][0];
+                    }
+                    else{
+                        changeDataBox.selectOne = false;
+                        deleteDataBox.selectOne = false;
+                    }
+
+
+                } )
+                .on( 'deselect', function ( e, dt, type, indexes ) {
+                    var rowData = table.rows( { selected: true } ).data().toArray();
+                    console.log(rowData);
+                    var selectedRowCnt = rowData.length;
+                    if(selectedRowCnt == 1){
+                        changeDataBox.selectOne = true;
+                        deleteDataBox.selectOne = true;
+                        changeDataBox.selectID =  rowData[0][0];
+                        deleteDataBox.selectID =  rowData[0][0];
+                    }
+                    else{
+                        changeDataBox.selectOne = false;
+                        deleteDataBox.selectOne = false;
+                    }
+                } );
+
+        /* append buttons */
+        var changeDataBox = new Vue({
+            el:'#changeDataBox',
+            data:{
+                selectOne:false,
+                selectID:1
+            },
+            watch:{
+
+            },
+            methods: {
+
+            },
+            computed :{
+                url:function(){
+                    // build the URL
+                    var url = '{{ reverse_url('contrib.admin.view.appModelChangeManager',modelName,'') }}';
+                    var buildURL = url.substring(0,url.length-1);
+                    buildURL += this.selectID.toString();
+                    buildURL += '/';
+                    return buildURL;
+                },
+
+
+                selectError:function(){
+                    return !this.selectOne;
+                }
+
+            }
+        });
+
+        var deleteDataBox = new Vue({
+            el:'#deleteDataBox',
+            data:{
+                selectOne:false,
+                selectID:1
+            },
+            watch:{
+
+            },
+            computed :{
+                url:function(){
+                    // build the URL
+                    var url = '{{ reverse_url('contrib.admin.view.appModelDeleteManager',modelName,'') }}';
+                    var buildURL = url.substring(0,url.length-1);
+                    buildURL += this.selectID.toString();
+                    buildURL += '/';
+                    return buildURL;
+                },
+
+
+                selectError:function(){
+                    return !this.selectOne;
+                }
+
+            }
+        });
+
+
+
+    } );
+</script>
+{% end %}

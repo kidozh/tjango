@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block webtitle %}登陆出错{% end %}
+
+{% block content %}
+<!-- login background -->
+<div class="container-fluid login-background">
+
+    <div class="row login-chart">
+        <div class="col-md-3 col-lg-5">
+            <h2 class="title text-right">登陆</h2>
+            <h6 class="title text-right">NWPUACM 实验站</h6>
+
+        </div>
+        <div class="col-md-8 col-lg-6 ">
+            <form action="{{ reverse_url('contrib.admin.view.authRequestHandler') }}" method="post">
+                <div class="login-form">
+                    <div class="form-group">
+                        <label>{{ handler._reason }}</label>
+                    </div>
+                    {% raw xsrf_form_html() %}
+                    <div class="form-group">
+                        <input type="text" class="form-control login-field" name="username" value="{{ handler.username }}" placeholder="用户名" id="login-name" />
+                        <label class="login-field-icon fui-user" for="login-name"></label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" class="form-control login-field" name="password" value="{{ handler.password }}" placeholder="密码" id="login-pass" />
+                        <label class="login-field-icon fui-lock" for="login-pass"></label>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg btn-block" href="#">登陆</button>
+                    <a class="login-link" href="#">忘记密码?</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+{% end %}

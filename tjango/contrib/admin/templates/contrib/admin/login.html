@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block webtitle %}登陆{% end %}
+
+{% block header %}
+<!-- flat-UI -->
+<link href="//cdn.bootcss.com/flat-ui/2.3.0/css/flat-ui.min.css" rel="stylesheet">
+<script src="//cdn.bootcss.com/flat-ui/2.3.0/js/flat-ui.min.js"></script>
+<!-- foundation -->
+<script src="//cdn.bootcss.com/foundation/6.2.4/foundation.min.js"></script>
+<!-- custome -->
+<link href="/static/admin/css/style.css" rel="stylesheet">
+<!--jquery cookie -->
+<script src="//cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+
+{% end %}
+
+{% block content %}
+<!-- login background -->
+<div class="container-fluid login-background">
+
+    <div class="row login-chart">
+        <div class="col-md-3 col-lg-5">
+            <h2 class="title text-right">登陆</h2>
+            <h6 class="title text-right">{% module get_option('SITE_NAME') %}</h6>
+
+
+        </div>
+        <div class="col-md-8 col-lg-6 ">
+            <form action="{{ reverse_url('contrib.admin.view.authRequestHandler') }}" method="post">
+                <div class="login-form">
+                    <div class="form-group">
+                        {% if handler.get_current_user() %}
+                        <script>
+                            $(document).ready(function() {
+                                setTimeout(function() {
+                                    toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'slideDown',
+                                        timeOut: 10000
+                                    };
+                                    toastr.success( '您可以直接登陆到仪表盘。','您已经登陆');
+                                }, 1300)}
+                            );
+                        </script>
+                            <p>您已经登陆，是否以<a href="{{ reverse_url('contrib.admin.view.adminManageHandler')  }}">{{ handler.get_current_user().nickname }}</a> 登陆？</p>
+                        {% end %}
+                    </div>
+
+
+                    {% raw xsrf_form_html() %}
+                    <div class="form-group">
+                        <input type="text" class="form-control login-field" name="username" value="" placeholder="用户名" id="login-name" />
+                        <label class="login-field-icon fui-user" for="login-name"></label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" class="form-control login-field" name="password" value="" placeholder="密码" id="login-pass" />
+                        <label class="login-field-icon fui-lock" for="login-pass"></label>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg btn-block" href="#">登陆</button>
+                    <a class="login-link" href="#">忘记密码?</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+{% end %}
+
+{% block footerJS %}
+<script>
+    $().ready(function(){
+        var ishttps = 'https:' == document.location.protocol ? true: false;
+        if (!ishttps){
+            setTimeout(function() {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 10000,
+                    onclick:addCookie()
+                };
+                toastr.warning('HTTP协议下的明文的数据传输容易被劫持，请慎重输入密码，或者联系管理员为这个站点添加HTTPS','注意您的密码安全');
+
+
+            }, 300);
+        }
+        else{
+            setTimeout(function() {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 10000,
+                    onclick:addCookie()
+                };
+                toastr.success('您的信息使用更安全的HTTPS传输！','HTTPS支持');
+
+
+            }, 300);
+        }
+    });
+
+</script>
+
+{% end %}

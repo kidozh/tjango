@@ -1,0 +1,69 @@
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar" id="scrollspy">
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="//cdn.bootcss.com/admin-lte/2.3.8/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>{{ handler.get_current_user().nickname }}</p>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- search form -->
+        <form action="#" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search...">
+              <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+              </span>
+            </div>
+        </form>
+
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu">
+            <li class="header">Management</li>
+            <li class="active">
+                <a href="{{ reverse_url('contrib.admin.view.adminManageHandler') }}">
+                    <i class="fa fa-circle-o"></i> <span>Overview</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+            </li>
+            {% for app,model in modelsList %}
+            <li class="treeview" id="scrollspy-components">
+                <a href="javascript:void(0)">
+                    <i class="fa fa-table"></i><span>{{ app }}</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    {% if len(model) == 0 %}
+                    <li>
+                        <a href="#">无。</a>
+                    </li>
+                    <!-- close UL -->
+                </ul>
+            </li>
+
+            {% continue %}
+            {% end %}
+
+            {% set modelAl = model %}
+            {% for name,cls in modelAl %}
+            <li><a href="{{ reverse_url('contrib.admin.view.appModelManager',name) }}">{{ name }}</a> </li>
+            {% end %}
+
+        </ul>
+        </li>
+
+
+        {% end %}
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

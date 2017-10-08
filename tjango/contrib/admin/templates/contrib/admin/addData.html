@@ -1,0 +1,185 @@
+{% extends 'manageBase.html' %}
+
+{% block webtitle %}管理{{ modelName }}{% end %}
+
+{% block header %}
+<link href="{{ static_url('admin/css/light-custome.css') }}" rel="stylesheet">
+
+<!-- chart.js -->
+<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.js"></script>
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.common.js"></script>-->
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/extension/dataTool.min.js"></script>
+<script src="//cdn.bootcss.com/echarts/3.3.1/extension/bmap.min.js"></script>-->
+<!--<script src="//cdn.bootcss.com/echarts/3.3.1/echarts.simple.min.js"></script>-->
+
+<!-- vue -->
+<script src="//cdn.bootcss.com/vue/2.1.4/vue.js"></script>
+
+<!-- font awesome -->
+<link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<!--dataTable-->
+<!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/af-2.1.3/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/cr-1.3.2/fc-3.2.2/fh-3.1.2/kt-2.2.0/r-2.1.0/rr-1.2.0/sc-1.4.2/se-1.2.0/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/af-2.1.3/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/cr-1.3.2/fc-3.2.2/fh-3.1.2/kt-2.2.0/r-2.1.0/rr-1.2.0/sc-1.4.2/se-1.2.0/datatables.min.js"></script>
+-->
+<!--<link href="//cdn.bootcss.com/datatables/1.10.13/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="//cdn.bootcss.com/datatables/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet">
+
+<script src="//cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.bootcss.com/datatables/1.10.13/js/dataTables.bootstrap.min.js"></script>-->
+<!-- i check -->
+<link href="//cdn.bootcss.com/iCheck/1.0.2/skins/all.css" rel="stylesheet">
+
+<script src="//cdn.bootcss.com/iCheck/1.0.2/icheck.min.js"></script>
+
+{% end %}
+
+{% block content %}
+
+
+{# {% include 'leftSideBar.html' %} #}
+
+<!-- start new content-->
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="content-header">
+                <h1>
+                    数据管理
+                </h1>
+                <ol class="breadcrumb">
+                    <li><a href="{{ reverse_url('contrib.admin.view.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
+                    <li><a href="#"><i class="fa fa-server "></i> {{ package }}</a></li>
+                    <li><i class="fa fa-database "></i> {{ modelName }}</li>
+                    <li class="active"><i class="fa fa-sticky-note">添加或修改</i> </li>
+                </ol>
+            </div>
+
+            <div class="content body">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <form action="{{ reverse_url('contrib.admin.view.appModelAddManager',modelName) }}" method="post">
+                        {% raw  xsrf_form_html() %}
+                            {% for (fieldName,field) in allValidField %}
+                            {% set fieldClassName = type(field).__name__  %}
+
+                            <div class="form-group">
+                                {# assert fieldClass #}
+                                {% if fieldClassName != 'PrimaryKeyField' %}
+                                    <label for="{{ fieldName }}">{{ fieldName }}</label>
+                                {% end %}
+                                {% if fieldClassName == 'PrimaryKeyField' %}
+                                    <input type="number" hidden value="" name="{{ fieldName }}">
+
+                                {% elif fieldClassName == 'CharField' %}
+                                {# we need to see whether there is choice option #}
+                                {% if getattr(field,'choices',None) != None %}
+                                    <select name="{{ fieldName }}" class="form-control">
+                                    {% for value,displayText in getattr(field,'choices') %}
+                                        <option value="{{ value }}">{{ displayText }}</option>
+
+                                    {% end %}
+                                    </select>
+                                {% else %}
+                                    <input type="text" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" maxlength="{{ field.max_length }}">
+                                {% end %}
+
+
+                                {% elif fieldClassName == 'FixedCharField' %}
+                                    <input type="text" class="form-control" name="{{ fieldName }}" pattern=".{% raw '{' %} {{ field.max_length }} {% raw '}' %}">
+
+                                {% elif fieldClassName == 'TextField' %}
+                                    <textarea class="form-control" name="{{ fieldName }}"></textarea>
+
+                                {% elif fieldClassName == 'DateTimeField' %}
+                                    <input type="datetime" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="datetime">
+                                {% elif fieldClassName == 'IntegerField' or fieldClassName == 'BigIntegerField' or fieldClassName == 'SmallIntegerField' %}
+                                    <input type="number" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="">
+
+                                {% elif fieldClassName == 'BooleanField' %}
+                                    <input type="radio" name="{{ fieldName }}" value="1"><label for="{{ fieldName }}">是</label>
+                                    <input type="radio" name="{{ fieldName }}" value="0"><label for="{{ fieldName }}">否</label>
+                                {% elif fieldClassName == 'FloatField' or fieldClassName == 'DoubleField' or fieldClassName == 'DecimalField' %}
+                                    <input type="number" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="">
+
+                                {% elif fieldClassName == 'DateField' %}
+                                    <input type="date" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="date">
+                                {% elif fieldClassName == 'TimeField' %}
+                                    <input type="time" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="time">
+                                {% elif fieldClassName == 'TimestampField' %}
+                                    <input type="number" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="timeStamp">
+
+                                {% elif fieldClassName == 'BlobField' %}
+                                    <input type="text" disabled {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="timeStamp">
+                                    <div class="callout callout-danger">
+                                        <h4>二进制</h4>
+                                        <p for="help">您无法于仪表盘之中添加以及变更二进制域的内容，该项已禁用。</p>
+                                    </div>
+
+                                {% elif fieldClassName == 'UUIDField' %}
+                                    <input type="text" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" pattern=". {% raw '{' %} 40  {% raw '}' %} ">
+                                    <p for="help">UUID是长度为40的通用唯一识别码，详情您可以点击<a href="https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%94%AF%E4%B8%80%E8%AF%86%E5%88%AB%E7%A0%81">这里</a></p>
+                                {% elif fieldClassName == 'PasswordField' %}
+                                    <input type="text" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" pattern=". {% raw '{' %} 8,56  {% raw '}' %} ">
+
+                                        <p for="help">bcrypt是一个跨平台的文件加密工具，详情您可以点击<a href="https://zh.wikipedia.org/wiki/Bcrypt">这里</a>,其需要8-56位的口令，在新增页之中，您可以直接键入口令，而不是加密后的446位字符。</p>
+
+                                {% elif fieldClassName == 'AESEncryptedField' %}
+                                    <input type="text" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}">
+
+                                        <p for="help">AES是对称密钥加密算法，详情您可以点击<a href="https://zh.wikipedia.org/wiki/%E9%AB%98%E7%BA%A7%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86">这里</a>,其需要8-56位的口令，在新增页之中，您可以直接键入需要加密的内容。</p>
+
+
+                                {% elif fieldClassName == 'PickledField' %}
+                                    <input type="text" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}">
+
+                                        <p for="help">Pickle是Python对象的序列化方法，详情您可以点击<a href="https://docs.python.org/2/library/pickle.html">这里</a>，在新增页之中，您需要键入Pickle后的内容并伴随着Python的检查。</p>
+
+
+                                {% end %}
+                                {% if hasattr(field,'help_text') and field.help_text %}
+                                    <div class="callout callout-success">
+                                        <!--<h4>来自字段{{ fieldName }}的提醒</h4>-->
+                                        <p for="help">{{ field.help_text }}</p>
+                                    </div>
+                                {% end %}
+                            </div>
+                        {% end %}
+                            <div class="form-group">
+                                <button class="btn btn-danger" type="submit">提交</button>
+                                <button class="btn btn-warning" type="reset">清空</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% end %}
+
+{% block footerJS %}
+<script>
+    function getBodyStyle(){
+        var regex = /skin-(\w+)(-?).*?/;
+        var className = $('body')[0].className;
+        var color = className.match(regex);
+        if(color.length && color[1] !='black'){
+            return '-'+color[1];
+        }
+        else{
+            // use default if not find
+            return '';
+        }
+    }
+
+    $(document).ready(function(){
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_flat'+getBodyStyle(),
+            radioClass: 'iradio_flat'+getBodyStyle()
+        });
+    });
+</script>
+{% end %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block webtitle %}错误{{ status_code }}{% end %}
+
+{% block content %}
+<!-- login background -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="jumbotron login-chart">
+                <h1 class="text-center">{{ handler._status_code }}</h1>
+                <hr class="color-line" />
+                <p class="text-center">{{ handler._reason }}</p>
+                <p class="text-center"><a class="btn btn-danger" href="/">返回主页</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% end %}
