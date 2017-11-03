@@ -17,10 +17,6 @@ DEBUG = False
 # 'anotheremail@example.com')]
 ADMINS = []
 
-# Hosts/domain names that are valid for this site.
-# "*" matches anything, ".example.com" matches example.com and all subdomains
-ALLOWED_HOSTS = []
-
 # Local time zone for this installation. All choices can be found here:
 # https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
@@ -52,3 +48,6 @@ EMAIL_USE_SSL = False
 EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
 EMAIL_TIMEOUT = None
+
+# Template path configuration
+DISTRIBUTE_TEMPLATE_DIR = False

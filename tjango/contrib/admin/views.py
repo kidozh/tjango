@@ -14,7 +14,16 @@ from tjango.db.utils import fieldFinder
 
 
 class authBaseHandler(tornado.web.RequestHandler):
-    # peewee
+    # do not use it in other page since it will reconfigure template
+    def get_template_path(self):
+        """Override to customize template path for each handler.
+
+        By default, we use the ``template_path`` application setting.
+        Return None to load templates relative to the calling file.
+        """
+        return None
+
+
     def prepare(self):
         try:
             database.connect()
@@ -46,13 +55,13 @@ class authBaseHandler(tornado.web.RequestHandler):
     def write_error(self, status_code, **kwargs):
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/error.html', **args)
+        self.render('templates/contrib/admin/error.html', **args)
 
 
 class authRequestHandler(authBaseHandler):
     def get(self, *args, **kwargs):
         # self.render('portal/index.html')
-        self.render('contrib/admin/login.html')
+        self.render('templates/contrib/admin/login.html')
 
     def post(self, *args, **kwargs):
         username = self.get_argument('username')
@@ -93,7 +102,7 @@ class authRequestHandler(authBaseHandler):
                         self.write_error(404)
                     # redirect
                     self.redirect(
-                        self.reverse_url('contrib.admin.view.adminManageHandler'))
+                        self.reverse_url('templates/contrib.admin.view.adminManageHandler'))
                 else:
                     self._reason = '用户名或者密码错误'
                     self.write_error(404)
@@ -108,7 +117,7 @@ class authRequestHandler(authBaseHandler):
     def write_error(self, status_code, **kwargs):
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/loginError.html', **args)
+        self.render('templates/contrib/admin/loginError.html', **args)
 
 
 class adminManageHandler(authBaseHandler):
@@ -148,7 +157,7 @@ class adminManageHandler(authBaseHandler):
         # fill render parameter
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/manage.html', **args)
+        self.render('templates/contrib/admin/manage.html', **args)
 
 
 # a HTTP handler for status api
@@ -280,7 +289,7 @@ class appModelManager(authBaseHandler):
 
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/tableData.html', **args)
+        self.render('templates/contrib/admin/tableData.html', **args)
 
 
 class appModelAddManager(authBaseHandler):
@@ -324,7 +333,7 @@ class appModelAddManager(authBaseHandler):
 
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/addData.html', **args)
+        self.render('templates/contrib/admin/addData.html', **args)
 
     def post(self, modelName, *args, **kwargs):
         package, aimModel = self.getModelByName(modelName)
@@ -373,7 +382,7 @@ class appModelAddManager(authBaseHandler):
 
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/addData.html', **args)
+        self.render('templates/contrib/admin/addData.html', **args)
 
 
 class appModelChangeManager(authBaseHandler):
@@ -427,7 +436,7 @@ class appModelChangeManager(authBaseHandler):
 
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/changeData.html', **args)
+        self.render('templates/contrib/admin/changeData.html', **args)
 
     @tornado.web.authenticated
     def post(self, modelName, id, *args, **kwargs):
@@ -519,7 +528,7 @@ class appModelDeleteManager(authBaseHandler):
 
         args = locals()
         args.pop('self')
-        self.render('contrib/admin/deleteData.html', **args)
+        self.render('templates/contrib/admin/deleteData.html', **args)
 
     @tornado.web.authenticated
     def post(self, modelName, id, *args, **kwargs):

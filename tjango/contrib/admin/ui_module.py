@@ -30,6 +30,14 @@ class optionModule(tornado.web.UIModule):
 
 
 class appModelModule(tornado.web.UIModule):
+    def get_template_path(self):
+        """Override to customize template path for each handler.
+
+        By default, we use the ``template_path`` application setting.
+        Return None to load templates relative to the calling file.
+        """
+        return None
+
     def render(self, *args, **kwargs):
         from tjango.contrib.admin.utils import modelFinder
         modelsFinder = modelFinder()
@@ -37,4 +45,5 @@ class appModelModule(tornado.web.UIModule):
         modelsList = modelsFinder.getInstalledModel()
         args = locals()
         args.pop('self')
-        return self.render_string('contrib/admin/leftSideBar.html', **args)
+        return self.render_string(
+            'templates/contrib/admin/leftSideBar.html', **args)

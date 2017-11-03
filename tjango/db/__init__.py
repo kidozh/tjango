@@ -1,4 +1,6 @@
 from tjango.conf import setting
+
+
 class connectHandler:
     def __init__(self):
         Setting = setting()
@@ -21,13 +23,11 @@ class connectHandler:
             # use default driver
             # use default utf8 to prevent encode characters error
             sqlAddress = '%s://%s:%s@%s/%s?charset=utf8' % (
-            self.DB_TYPE, self.DB_USER, self.DB_PASSWD, self.DB_HOST, self.DB_NAME)
+                self.DB_TYPE, self.DB_USER, self.DB_PASSWD, self.DB_HOST, self.DB_NAME)
         else:
             sqlAddress = '%s+%s://%s:%s@%s/%s?charset=utf8' % (
-            self.DB_TYPE, self.DB_DRIVER, self.DB_USER, self.DB_PASSWD, self.DB_HOST, self.DB_NAME)
+                self.DB_TYPE, self.DB_DRIVER, self.DB_USER, self.DB_PASSWD, self.DB_HOST, self.DB_NAME)
         return sqlAddress
-
-
 
 
 from tjango.db import connectHandler
@@ -36,4 +36,3 @@ connectDB = connectHandler()
 
 from playhouse.db_url import connect
 database = connect(connectDB.connect_address)
-

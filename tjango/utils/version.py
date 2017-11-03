@@ -1,5 +1,4 @@
 import datetime
-import functools
 import os
 import subprocess
 from distutils.version import LooseVersion

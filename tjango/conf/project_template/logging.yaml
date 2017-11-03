@@ -1,0 +1,34 @@
+# logging.yaml
+# Refer to tornado yaml logging
+
+version: 1
+disable_existing_loggers: false
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+loggers:
+  all:
+    handlers: [all]
+    propagate: false
+  tornado:
+    handlers: [all]
+    propagate: false
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+  all:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: simple
+    when: midnight
+    filename: ./log/server.log
+
+root:
+  level: INFO
+  handlers: [console, all]
+  propagate: true
