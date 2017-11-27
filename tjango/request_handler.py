@@ -6,21 +6,21 @@ from tjango.contrib.admin.models import *
 import datetime
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class baseHandler(tornado.web.RequestHandler):
     # peewee
     def prepare(self):
         try:
             database.connect()
         except BaseException:
             pass
-        return super(BaseHandler, self).prepare()
+        return super(baseHandler, self).prepare()
 
     def on_finish(self):
         # save to database...
 
         if not database.is_closed():
             database.close()
-        return super(BaseHandler, self).on_finish()
+        return super(baseHandler, self).on_finish()
 
     def get_current_user(self):
         # check current user privilege

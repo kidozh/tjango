@@ -2,6 +2,11 @@ from setuptools import setup, find_packages
 
 version = __import__('tjango').get_version()
 
+
+EXCLUDE_FROM_PACKAGES = ['tjango.conf.project_template',
+                         'tjango.conf.app_template',
+                         ]
+
 # setup for tjango
 setup(
     name='tjango',
