@@ -1,19 +1,19 @@
 import tjango.contrib.admin.ui_module
 
 urlpatterns = [
-    ('/', 'contrib.admin.view.adminManageHandler'),
-    ('/login/', 'contrib.admin.view.authRequestHandler'),
-    ('/manage/', 'contrib.admin.view.adminManageHandler'),
-    ('/manage/(?P<modelName>.+)/data/', 'contrib.admin.view.appModelApiManager'),
-    ('/manage/(?P<modelName>.+)/show/', 'contrib.admin.view.appModelManager'),
-    ('/manage/(?P<modelName>.+)/add/', 'contrib.admin.view.appModelAddManager'),
+    ('/', 'tjango.contrib.admin.views.adminManageHandler'),
+    ('/login/', 'tjango.contrib.admin.views.authRequestHandler'),
+    ('/manage/', 'tjango.contrib.admin.views.adminManageHandler'),
+    ('/manage/(?P<modelName>.+)/data/', 'tjango.contrib.admin.views.appModelApiManager'),
+    ('/manage/(?P<modelName>.+)/show/', 'tjango.contrib.admin.views.appModelManager'),
+    ('/manage/(?P<modelName>.+)/add/', 'tjango.contrib.admin.views.appModelAddManager'),
     ('/manage/(?P<modelName>.+)/change/(?P<id>.+)/',
-     'contrib.admin.view.appModelChangeManager'),
+     'tjango.contrib.admin.views.appModelChangeManager'),
     ('/manage/(?P<modelName>.+)/delete/(?P<id>.+)/',
-     'contrib.admin.view.appModelDeleteManager'),
+     'tjango.contrib.admin.views.appModelDeleteManager'),
     # monitor system
-    ('/serverStatus', 'contrib.admin.view.statusAPIHandler'),
-    ('/serverStatusWS', 'contrib.admin.view.statusWebsocketAPIHandler'),
+    ('/serverStatus', 'tjango.contrib.admin.views.statusAPIHandler'),
+    ('/serverStatusWS', 'tjango.contrib.admin.views.statusWebsocketAPIHandler'),
     # chat channel so that administrator could chat realtime or record some
     # data
 

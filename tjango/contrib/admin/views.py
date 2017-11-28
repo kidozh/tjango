@@ -61,6 +61,7 @@ class authBaseHandler(tornado.web.RequestHandler):
 class authRequestHandler(authBaseHandler):
     def get(self, *args, **kwargs):
         # self.render('portal/index.html')
+
         self.render('templates/contrib/admin/login.html')
 
     def post(self, *args, **kwargs):

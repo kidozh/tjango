@@ -19,7 +19,11 @@ class connectHandler:
 
     @property
     def connect_address(self):
-        if self.DB_DRIVER == '':
+
+        # mysql
+        if self.DB_TYPE == 'sqlite':
+            sqlAddress = 'sqlite:///%s'%(self.DB_NAME)
+        elif self.DB_DRIVER == '':
             # use default driver
             # use default utf8 to prevent encode characters error
             sqlAddress = '%s://%s:%s@%s/%s?charset=utf8' % (

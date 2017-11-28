@@ -39,10 +39,10 @@ def execute_from_command_line():
         show_help_info()
         return
 
-    print(argv, sys.argv)
+    # print(argv, sys.argv)
     module_name = argv[0]
     command_module = importlib.import_module('tjango.management.command.%s'%(module_name),'command')
-    print(command_module)
+    # print(command_module)
     # execute command
     command_instance = command_module.command()
     command_instance.execute()

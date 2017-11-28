@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # set environmental value for setting
     from tjango.conf import ENVIRONMENT_VARIABLE,setting
     # refer the setting modules
-    os.environ[ENVIRONMENT_VARIABLE] = 'setting'
+    os.environ[ENVIRONMENT_VARIABLE] = 'settings'
 
     # parse command
     tornado.options.parse_command_line()

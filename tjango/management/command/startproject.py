@@ -17,3 +17,4 @@ class command(baseCommand):
         else:
             raise ValueError('Only one parameters is needed, but you gave %s'%(argv))
         self.create_project_or_app(self.create_type,project_name)
+        print('Project %s has been successfully created' %(project_name))
