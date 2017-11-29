@@ -7,6 +7,14 @@ import datetime
 
 
 class baseHandler(tornado.web.RequestHandler):
+    def get_template_path(self):
+        """Override to customize template path for each handler.
+
+        By default, we use the ``template_path`` application setting.
+        Return None to load templates relative to the calling file.
+        """
+        return None
+
     # peewee
     def prepare(self):
         try:

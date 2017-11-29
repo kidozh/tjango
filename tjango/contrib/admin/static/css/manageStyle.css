@@ -4,7 +4,8 @@
 
 /* font from Google */
 /*@import url('https://fonts.googleapis.com/css?family=Exo+2');*/
-@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+/*@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');*/
+@import url('https://fonts.googleapis.com/css?family=Lato');
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 @import url('https://fonts.googleapis.com/css?family=Oxygen');
 
@@ -29,7 +30,7 @@ h4,
 h5,
 h6{
     font-weight: lighter;
-    font-family: 'Josefin Sans', "Microsoft YaHei UI", sans-serif;
+    font-family: 'Lato', "Microsoft YaHei UI", sans-serif;
 }
 p,
 a,
