@@ -1,0 +1,3 @@
+from tjango.db.models import baseModel
+
+# Create your models here.
