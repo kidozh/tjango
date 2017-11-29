@@ -5,6 +5,7 @@ Make tornado more djangoful
 # TODO
 
 * make admin page support more model type
+* function fix in admin page
 
 # feature
 
