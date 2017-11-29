@@ -11,10 +11,24 @@ import platform
 import json
 from tjango.contrib.admin.utils import modelFinder
 from tjango.db.utils import fieldFinder
+from tornado.web import StaticFileHandler
 
 
 class authBaseHandler(tornado.web.RequestHandler):
     # do not use it in other page since it will reconfigure template
+
+    # compatible with admin static file
+    def static_url(self, path, include_host=None, **kwargs):
+        if include_host is None:
+            include_host = getattr(self, "include_host", False)
+
+        if include_host:
+            base = self.request.protocol + "://" + self.request.host
+        else:
+            base = ""
+
+        return base +'%s'%(self.reverse_url("<class 'tornado.web.StaticFileHandler'>",path))
+
     def get_template_path(self):
         """Override to customize template path for each handler.
 
@@ -25,6 +39,8 @@ class authBaseHandler(tornado.web.RequestHandler):
 
 
     def prepare(self):
+        # configuration for admin page
+
         try:
             database.connect()
         except BaseException:
@@ -71,7 +87,7 @@ class authRequestHandler(authBaseHandler):
         self.password = password
 
         # make sure bcrypt could encrypt this password
-        if len(password) <= 8 or len(password) >= 21:
+        if len(password) < 8 or len(password) >= 21:
             self._reason = '密码应为8-20位'
             self.write_error(500)
         else:
@@ -103,7 +119,7 @@ class authRequestHandler(authBaseHandler):
                         self.write_error(404)
                     # redirect
                     self.redirect(
-                        self.reverse_url('templates/contrib.admin.view.adminManageHandler'))
+                        self.reverse_url('tjango.contrib.admin.views.adminManageHandler'))
                 else:
                     self._reason = '用户名或者密码错误'
                     self.write_error(404)
@@ -378,7 +394,7 @@ class appModelAddManager(authBaseHandler):
             return
         self.redirect(
             self.reverse_url(
-                'contrib.admin.view.appModelManager',
+                'tjango.contrib.admin.views.appModelManager',
                 modelName))
 
         args = locals()
@@ -474,7 +490,7 @@ class appModelChangeManager(authBaseHandler):
         aimRow.save()
         self.redirect(
             self.application.reverse_url(
-                'contrib.admin.view.appModelManager',
+                'tjango.contrib.admin.views.appModelManager',
                 modelName))
 
 
@@ -551,7 +567,7 @@ class appModelDeleteManager(authBaseHandler):
 
         self.redirect(
             self.application.reverse_url(
-                'contrib.admin.view.appModelManager',
+                'tjango.contrib.admin.view.appModelManager',
                 modelName))
 
 
@@ -787,6 +803,8 @@ class appModelApiManager(authBaseHandler):
                     # only add 100
                     if len(obj) > 100:
                         obj = '%s...' % (obj[0:99])
+                elif isinstance(obj,bytes):
+                    obj = obj.decode('utf-8')
                 dataDict[name] = obj
                 listData.append(obj)
             data.append(listData)
@@ -797,7 +815,9 @@ class appModelApiManager(authBaseHandler):
         returnedData['recordsTotal'] = recordsTotal
         returnedData['recordsFiltered'] = recordsFiltered
         returnedData['data'] = data
+        print(data)
 
         import tornado.escape
+        # self.write(json.dumps(returnedData))
         self.write(tornado.escape.json_encode(returnedData))
         self.finish()

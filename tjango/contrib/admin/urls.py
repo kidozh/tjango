@@ -1,4 +1,7 @@
 import tjango.contrib.admin.ui_module
+import tornado.web
+import os.path
+import tjango
 
 urlpatterns = [
     ('/', 'tjango.contrib.admin.views.adminManageHandler'),
@@ -16,6 +19,8 @@ urlpatterns = [
     ('/serverStatusWS', 'tjango.contrib.admin.views.statusWebsocketAPIHandler'),
     # chat channel so that administrator could chat realtime or record some
     # data
+    # static admin file
+    ('/static/admin/(.*?)',tornado.web.StaticFileHandler,dict(path=os.path.join(tjango.__path__[0],'contrib','admin','static')))
 
 ]
 

@@ -3,7 +3,7 @@
 {% block webtitle %}管理{% end %}
 
 {% block header %}
-<link href="{{ static_url('admin/css/light-custome.css') }}" rel="stylesheet">
+<link href="{{ static_url('css/light-custome.css') }}" rel="stylesheet">
 
 <!-- chart.js -->
 <script src="//cdn.bootcss.com/echarts/3.3.1/echarts.js"></script>
@@ -32,10 +32,10 @@
             <div class="content-header">
                 <h1>
                     服务器概况
-                    <small>Current version 2.3.0</small>
+                    <small>Powered by psutil</small>
                 </h1>
                 <ol class="breadcrumb">
-                    <li><a href="{{  reverse_url('contrib.admin.view.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
+                    <li><a href="{{  reverse_url('tjango.contrib.admin.views.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
                     <li class="active">总览</li>
                 </ol>
             </div>
@@ -329,7 +329,7 @@
 {% end %}
 
 {% block footerJS %}
-<script src="{{ static_url('admin/js/manage/manageView.js') }}"></script>
+<script src="{{ static_url('js/manage/manageView.js') }}"></script>
 
 
 
@@ -337,7 +337,7 @@
     var myChart = echarts.init(document.getElementById('main'));
     function getHardwareInfo(){
         xhr = $.ajax({
-            url:"{{ reverse_url('contrib.admin.view.statusAPIHandler') }}",
+            url:"{{ reverse_url('tjango.contrib.admin.views.statusAPIHandler') }}",
             // data which api server can accept
             data:{
 
@@ -385,7 +385,7 @@
     else{
         var wsProtocol = 'ws:'
     }
-    var statusURL = wsProtocol+'//'+location.hostname+':'+location.port+'{{ reverse_url('contrib.admin.view.statusWebsocketAPIHandler') }}';
+    var statusURL = wsProtocol+'//'+location.hostname+':'+location.port+'{{ reverse_url('tjango.contrib.admin.views.statusWebsocketAPIHandler') }}';
     var statusWS = new WebSocket(statusURL);
 
     statusWS.onerror=function(event){

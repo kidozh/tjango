@@ -21,6 +21,7 @@ class admin(baseModel):
     isAdmin = BooleanField(default=False, help_text=u'是否能具有管理员权限')
 
     def authPassword(self, password):
-        return bcrypt.checkpw(
-            password.encode('utf-8'),
-            self.password.encode('utf-8')) and len(password) > 8
+        return self.password.check_password(password)
+        # return bcrypt.checkpw(
+        #     password.encode('utf-8'),
+        #     self.password) and len(password) > 8

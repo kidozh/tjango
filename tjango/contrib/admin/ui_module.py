@@ -17,16 +17,20 @@ class optionModule(tornado.web.UIModule):
         except BaseException:
             flag = True
             pass
-        if configOption.select().where(configOption.name == option).exists():
-            if not flag:
-                database.close()
-            return tornado.escape.xhtml_escape(
-                configOption.get(configOption.name == option).value)
-
-        else:
-            if not flag:
-                database.close()
+        try:
+            if configOption.select().where(configOption.name == option).exists():
+                if not flag:
+                    database.close()
+                return tornado.escape.xhtml_escape(
+                    configOption.get(configOption.name == option).value)
+            else:
+                if not flag:
+                    database.close()
+                return ''
+        except Exception as e:
             return ''
+
+
 
 
 class appModelModule(tornado.web.UIModule):

@@ -44,7 +44,13 @@ class urlPackage:
                 urlList.append(it)
                 continue
             else:
-                url, url_module = it
+                # compatible with native tornado url configuration
+                url, url_module = it[:2]
+                if len(it) > 2:
+                    # there maybe some other configuration setting
+                    other_config = it[2:]
+                else:
+                    other_config = []
 
             # iterable get the URL
             if isinstance(url_module, urlPackage):
@@ -65,13 +71,27 @@ class urlPackage:
                     URLSpec(
                         assemblyURL,
                         url_module,
+                        *other_config,
                         name=url_module))
                 # set up mapper for
                 self.URLMapper[url_module] = assemblyURL
             else:
-                raise ImproperlyConfigured(
-                    'URL only accept string or URLpackage object(you can use include)'
+                # try to use directly
+                if headURL:
+                    assemblyURL = '%s%s' % (headURL, url)
+                else:
+                    assemblyURL = '%s' % url
+                urlList.append(
+                    URLSpec(
+                        assemblyURL,
+                        url_module,
+                        *other_config
+                        ,name=str(url_module)
+                    )
                 )
+                # raise ImproperlyConfigured(
+                #     'URL only accept string or URLpackage object(you can use include)'
+                # )
         return urlList
 
 

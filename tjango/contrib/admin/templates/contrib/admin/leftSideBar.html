@@ -26,7 +26,7 @@
         <ul class="sidebar-menu">
             <li class="header">Management</li>
             <li class="active">
-                <a href="{{ reverse_url('contrib.admin.view.adminManageHandler') }}">
+                <a href="{{ reverse_url('tjango.contrib.admin.views.adminManageHandler') }}">
                     <i class="fa fa-circle-o"></i> <span>Overview</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left pull-right"></i>
@@ -55,7 +55,7 @@
 
             {% set modelAl = model %}
             {% for name,cls in modelAl %}
-            <li><a href="{{ reverse_url('contrib.admin.view.appModelManager',name) }}">{{ name }}</a> </li>
+            <li><a href="{{ reverse_url('tjango.contrib.admin.views.appModelManager',name) }}">{{ name }}</a> </li>
             {% end %}
 
         </ul>

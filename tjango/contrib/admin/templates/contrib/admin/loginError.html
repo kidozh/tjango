@@ -13,19 +13,19 @@
 
         </div>
         <div class="col-md-8 col-lg-6 ">
-            <form action="{{ reverse_url('contrib.admin.view.authRequestHandler') }}" method="post">
+            <form action="{{ reverse_url('tjango.contrib.admin.views.authRequestHandler') }}" method="post">
                 <div class="login-form">
                     <div class="form-group">
                         <label>{{ handler._reason }}</label>
                     </div>
                     {% raw xsrf_form_html() %}
                     <div class="form-group">
-                        <input type="text" class="form-control login-field" name="username" value="{{ handler.username }}" placeholder="用户名" id="login-name" />
+                        <input type="text" class="form-control login-field" name="username" placeholder="用户名" id="login-name" />
                         <label class="login-field-icon fui-user" for="login-name"></label>
                     </div>
 
                     <div class="form-group">
-                        <input type="password" class="form-control login-field" name="password" value="{{ handler.password }}" placeholder="密码" id="login-pass" />
+                        <input type="password" class="form-control login-field" name="password" placeholder="密码" id="login-pass" />
                         <label class="login-field-icon fui-lock" for="login-pass"></label>
                     </div>
 

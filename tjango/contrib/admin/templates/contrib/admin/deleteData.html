@@ -3,7 +3,7 @@
 {% block webtitle %}管理{{ modelName }}{% end %}
 
 {% block header %}
-<link href="{{ static_url('admin/css/light-custome.css') }}" rel="stylesheet">
+<link href="{{ static_url('css/light-custome.css') }}" rel="stylesheet">
 
 <!-- chart.js -->
 <script src="//cdn.bootcss.com/echarts/3.3.1/echarts.js"></script>
@@ -49,7 +49,7 @@
                     数据管理
                 </h1>
                 <ol class="breadcrumb">
-                    <li><a href="{{ reverse_url('contrib.admin.view.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
+                    <li><a href="{{ reverse_url('tjango.contrib.admin.views.adminManageHandler') }}"><i class="fa fa-dashboard"></i> 管理</a></li>
                     <li><a href="#"><i class="fa fa-server "></i> {{ package }}</a></li>
                     <li><i class="fa fa-database "></i> {{ modelName }}</li>
                     <li class="active"><i class="fa fa-close">删除数据</i> </li>
@@ -59,7 +59,7 @@
             <div class="content body">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
-                        <form action="{{ reverse_url('contrib.admin.view.appModelDeleteManager',modelName,id) }}" method="post">
+                        <form action="{{ reverse_url('tjango.contrib.admin.views.appModelDeleteManager',modelName,id) }}" method="post">
                         {% raw  xsrf_form_html() %}
                             {% for (fieldName,field) in allValidField %}
                             {% set fieldClassName = type(field).__name__  %}

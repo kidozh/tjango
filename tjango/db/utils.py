@@ -41,7 +41,7 @@ class fieldFinder:
         :param appModel: a list that containing tuples like (attrname,attr)
         :return:
         '''
-        from db.models import baseModel
+        from tjango.db.models import baseModel
         import peewee
         import playhouse
 

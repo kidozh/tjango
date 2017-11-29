@@ -3,7 +3,7 @@
 Examples:
 Function views
     1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', 'views.home', name='home')
+    2. Add a URL to urlpatterns:  path('', 'views.home')
 Including another URLconf
     1. Import the include() function: from tjango.conf.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
@@ -13,7 +13,7 @@ from tjango.conf.urls import include
 
 
 urlpatterns = [
-    ('admin', include('tjango.contrib.admin.urls')),
+    ('^/admin', include('tjango.contrib.admin.urls')),
 
 
 ]
