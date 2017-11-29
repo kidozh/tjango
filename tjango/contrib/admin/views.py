@@ -4,15 +4,18 @@ __author__ = 'kidozh'
 import tornado.web
 import tornado
 import tornado.websocket
+import tornado.locale
 from tjango.db import connectHandler, database
 from tjango.contrib.admin.models import *
-import psutil
-import platform
-import json
+import tjango
 from tjango.contrib.admin.utils import modelFinder
 from tjango.db.utils import fieldFinder
 from tornado.web import StaticFileHandler
+import os.path
+import tornado.locale
 
+# locale
+user_locale = tornado.locale.get()
 
 class authBaseHandler(tornado.web.RequestHandler):
     # do not use it in other page since it will reconfigure template
@@ -40,6 +43,9 @@ class authBaseHandler(tornado.web.RequestHandler):
 
     def prepare(self):
         # configuration for admin page
+
+        # locale settings
+        tornado.locale.load_gettext_translations(os.path.join(tjango.__path__[0],'conf','locale'),'tjango')
 
         try:
             database.connect()
@@ -114,6 +120,7 @@ class authRequestHandler(authBaseHandler):
                     urlMapper = urlPackage(Setting._wrapped.ROOT_URLCONF)
                     # check permission
                     # auth permission
+
                     if not aimAdmin.isStaff:
                         self._reason = '您的账号目前无法访问仪表盘，请联系管理员。'
                         self.write_error(404)
@@ -121,10 +128,10 @@ class authRequestHandler(authBaseHandler):
                     self.redirect(
                         self.reverse_url('tjango.contrib.admin.views.adminManageHandler'))
                 else:
-                    self._reason = '用户名或者密码错误'
+                    self._reason = user_locale.translate('Wrong username or password')
                     self.write_error(404)
             else:
-                self._reason = '用户名或者密码错误'
+                self._reason = user_locale.translate('Wrong username or password')
                 self.write_error(404)
 
             args = locals()

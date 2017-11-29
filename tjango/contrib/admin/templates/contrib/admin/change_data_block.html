@@ -1,0 +1,98 @@
+{% raw  xsrf_form_html() %}
+                            {% for (fieldName,field) in allValidField %}
+                            {% set fieldClassName = type(field).__name__  %}
+
+                            <div class="form-group">
+                                {# assert fieldClass #}
+                                {% if fieldClassName != 'PrimaryKeyField' %}
+                                    <label for="{{ fieldName }}">{{ fieldName }}</label>
+                                {% end %}
+                                {% if fieldClassName == 'PrimaryKeyField' %}
+                                    <input type="number" hidden value="{{ getattr(aimRow,fieldName) }}" name="{{ fieldName }}">
+
+                                {% elif fieldClassName == 'CharField' %}
+                                {% if getattr(field,'choices',None) != None %}
+                                    <select name="{{ fieldName }}" class="form-control">
+                                    {% for value,displayText in getattr(field,'choices') %}
+                                        <option value="{{ value }}" {% if value == getattr(aimRow,fieldName) %} selected="selected" {% end %}>{{ displayText }}</option>
+
+                                    {% end %}
+                                    </select>
+                                {% else %}
+                                    <input type="text" {% if field.null == None or field.null == False %} required {% end %} value="{{ getattr(aimRow,fieldName) }}" class="form-control" name="{{ fieldName }}" maxlength="{{ field.max_length }}">
+                                {% end %}
+
+
+                                {% elif fieldClassName == 'FixedCharField' %}
+                                    <input type="text" value="{{ getattr(aimRow,fieldName) }}" class="form-control" name="{{ fieldName }}" pattern=".{% raw '{' %} {{ field.max_length }} {% raw '}' %}">
+
+                                {% elif fieldClassName == 'TextField' %}
+                                    <textarea class="form-control" name="{{ fieldName }}" value="{{ getattr(aimRow,fieldName) }}">{{ getattr(aimRow,fieldName) }}</textarea>
+
+                                {% elif fieldClassName == 'DateTimeField' %}
+                                    <input type="datetime-local" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="datetime">
+                                {% elif fieldClassName == 'IntegerField' or fieldClassName == 'BigIntegerField' or fieldClassName == 'SmallIntegerField' %}
+                                    <input type="number" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="">
+
+                                {% elif fieldClassName == 'BooleanField' %}
+                                    <input type="radio" name="{{ fieldName }}" value="1" {% if getattr(aimRow,fieldName) %}checked {% end %}><label for="{{ fieldName }}">{{_("Yes")}}</label>
+                                    <input type="radio" name="{{ fieldName }}" value="0" {% if getattr(aimRow,fieldName) == False %}checked  {% end %}><label for="{{ fieldName }}">{{_("No")}}</label>
+
+
+                                {% elif fieldClassName == 'FloatField' or fieldClassName == 'DoubleField' or fieldClassName == 'DecimalField' %}
+                                    <input type="number" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="">
+
+                                {% elif fieldClassName == 'DateField' %}
+                                    <input type="date" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="date">
+                                {% elif fieldClassName == 'TimeField' %}
+                                    <input type="time" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="time">
+                                {% elif fieldClassName == 'TimestampField' %}
+                                    <input type="number" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="timeStamp">
+
+                                {% elif fieldClassName == 'BlobField' %}
+                                    <input type="text" disabled {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" id="timeStamp">
+                                    <div class="callout callout-danger">
+                                        <h4>{{_("Bytes")}}</h4>
+                                        <p for="help">{{_("You can't add or change bytes in dashboard, this field is forbidden.")}}</p>
+                                    </div>
+
+                                {% elif fieldClassName == 'UUIDField' %}
+                                    <input type="text" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}" pattern=". {% raw '{' %} 40  {% raw '}' %} ">
+                                    <p for="help">{{_("Things about UUID, you could get information from ")}}<a href="https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%94%AF%E4%B8%80%E8%AF%86%E5%88%AB%E7%A0%81">{{_("here")}}</a></p>
+                                {% elif fieldClassName == 'PasswordField' %}
+                                    <input type="text" value="" class="form-control" name="{{ fieldName }}" pattern=". {% raw '{' %} 8,56  {% raw '}' %} ">
+                                        {# <p>密码项默认不显示，如果您需要修改密码，请键入<b>明文</b>密码即可，保持此项请留空。</p> #}
+
+                                        <p for="help">
+                                            {{_("bcrypt is a cross-platform encryption tool, you could click")}}
+                                            <a href="https://zh.wikipedia.org/wiki/Bcrypt">{{_("here")}}</a>,
+                                            {# 其需要8-56位的口令，在新增页之中，您可以直接键入口令，而不是加密后的446位字符。#}
+                                            {{_("it requires 8-52 digits password, in this page, just directly type password rather than encryption contents")}}
+                                        </p>
+
+                                {% elif fieldClassName == 'AESEncryptedField' %}
+
+                                    <input type="text" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}">
+
+                                        <p for="help">{{_("AES field requires 8-52 digits password, in this page, just directly type password rather than encryption contents")}}</p>
+
+
+                                {% elif fieldClassName == 'PickledField' %}
+                                    <input type="text" value="{{ getattr(aimRow,fieldName) }}" {% if field.null == None or field.null == False %} required {% end %} class="form-control" name="{{ fieldName }}">
+
+                                        <p for="help">{{_("Pickle field requires pickled string, be sure you have checked it.")}}</p>
+
+
+                                {% end %}
+                                {% if hasattr(field,'help_text') and field.help_text %}
+                                    <div class="callout callout-success">
+                                        <!--<h4>来自字段{{ fieldName }}的提醒</h4>-->
+                                        <p for="help">{{ field.help_text }}</p>
+                                    </div>
+                                {% end %}
+                            </div>
+                        {% end %}
+                            <div class="form-group">
+                                <button class="btn btn-danger" type="submit">{{_("submit")}}</button>
+                                <button class="btn btn-warning" type="reset">{{_("reset")}}</button>
+                            </div>

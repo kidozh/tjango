@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block webtitle %}登陆{% end %}
+{% block webtitle %}{{_("login")}}{% end %}
 
 {% block header %}
 
@@ -14,7 +14,7 @@
 
     <div class="row login-chart">
         <div class="col-md-3 col-lg-5">
-            <h2 class="title text-right">登陆</h2>
+            <h2 class="title text-right">{{_("login")}}</h2>
             <h6 class="title text-right">{% module get_option('SITE_NAME') %}</h6>
 
 
@@ -33,28 +33,28 @@
                                         showMethod: 'slideDown',
                                         timeOut: 10000
                                     };
-                                    toastr.success( '您可以直接登陆到仪表盘。','您已经登陆');
+                                    toastr.success( '{{_("You could directly login the dashboard.")}}','{{_("logined.")}}');
                                 }, 1300)}
                             );
                         </script>
-                            <p>您已经登陆，是否以<a href="{{ reverse_url('tjango.contrib.admin.views.adminManageHandler')  }}">{{ handler.get_current_user().nickname }}</a> 登陆？</p>
+                            <p>{{_("Use account")}}<a href="{{ reverse_url('tjango.contrib.admin.views.adminManageHandler')  }}">{{ handler.get_current_user().nickname }}</a> {{_('login')}}</p>
                         {% end %}
                     </div>
 
 
                     {% raw xsrf_form_html() %}
                     <div class="form-group">
-                        <input type="text" class="form-control login-field" name="username" value="" placeholder="用户名" id="login-name" />
+                        <input type="text" class="form-control login-field" name="username" value="" placeholder="{{_('username')}}" id="login-name" />
                         <label class="login-field-icon fui-user" for="login-name"></label>
                     </div>
 
                     <div class="form-group">
-                        <input type="password" class="form-control login-field" name="password" value="" placeholder="密码" id="login-pass" />
+                        <input type="password" class="form-control login-field" name="password" value="" placeholder="{{_('password')}}" id="login-pass" />
                         <label class="login-field-icon fui-lock" for="login-pass"></label>
                     </div>
 
-                    <button class="btn btn-primary btn-lg btn-block" href="#">登陆</button>
-                    <a class="login-link" href="#">忘记密码?</a>
+                    <button class="btn btn-primary btn-lg btn-block" href="#">{{_("login")}}</button>
+                    <a class="login-link" href="#">{{_("forget password?")}}</a>
                 </div>
             </form>
 
@@ -66,39 +66,6 @@
 {% end %}
 
 {% block footerJS %}
-<script>
-    $().ready(function(){
-        var ishttps = 'https:' == document.location.protocol ? true: false;
-        if (!ishttps){
-            setTimeout(function() {
-                toastr.options = {
-                    closeButton: true,
-                    progressBar: true,
-                    showMethod: 'slideDown',
-                    timeOut: 10000,
-                    onclick:addCookie()
-                };
-                toastr.warning('HTTP协议下的明文的数据传输容易被劫持，请慎重输入密码，或者联系管理员为这个站点添加HTTPS','注意您的密码安全');
 
-
-            }, 300);
-        }
-        else{
-            setTimeout(function() {
-                toastr.options = {
-                    closeButton: true,
-                    progressBar: true,
-                    showMethod: 'slideDown',
-                    timeOut: 10000,
-                    onclick:addCookie()
-                };
-                toastr.success('您的信息使用更安全的HTTPS传输！','HTTPS支持');
-
-
-            }, 300);
-        }
-    });
-
-</script>
 
 {% end %}

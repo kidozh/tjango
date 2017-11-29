@@ -8,7 +8,7 @@
             </div>
             <div class="pull-left info">
                 <p>{{ handler.get_current_user().nickname }}</p>
-                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                <a href="#"><i class="fa fa-circle text-success"></i> {{_("Online")}}</a>
             </div>
         </div>
         <!-- search form -->
@@ -24,7 +24,7 @@
 
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu">
-            <li class="header">Management</li>
+            <li class="header">{{_("Management")}}</li>
             <li class="active">
                 <a href="{{ reverse_url('tjango.contrib.admin.views.adminManageHandler') }}">
                     <i class="fa fa-circle-o"></i> <span>Overview</span>
@@ -44,7 +44,7 @@
                 <ul class="treeview-menu">
                     {% if len(model) == 0 %}
                     <li>
-                        <a href="#">无。</a>
+                        <a href="#">{{_("None.")}}</a>
                     </li>
                     <!-- close UL -->
                 </ul>

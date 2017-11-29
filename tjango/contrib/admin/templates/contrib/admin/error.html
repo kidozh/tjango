@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block webtitle %}错误{{ status_code }}{% end %}
+{% block webtitle %}{{_("Error")}} > {{ status_code }}{% end %}
 
 {% block content %}
 <!-- login background -->
@@ -11,7 +11,7 @@
                 <h1 class="text-center">{{ handler._status_code }}</h1>
                 <hr class="color-line" />
                 <p class="text-center">{{ handler._reason }}</p>
-                <p class="text-center"><a class="btn btn-danger" href="/">返回主页</a></p>
+                <p class="text-center"><a class="btn btn-danger" href="/">{{_("Back to home page")}}</a></p>
             </div>
         </div>
     </div>

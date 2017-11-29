@@ -4,3 +4,4 @@ recursive-include tjango/conf/project_template *
 recursive-include tjango/conf/app_template *
 recursive-include tjango/contrib/admin/templates *
 recursive-include tjango/contrib/admin/static *
+recursive-include tjango/conf/locale *

@@ -8,8 +8,8 @@ from playhouse.fields import PasswordField
 
 class admin(baseModel):
     username = CharField(unique=True)
-    nickname = CharField(max_length=20, help_text=u'将会对外显示', null=True)
-    password = PasswordField(help_text=u'采用bcrypt加密')
+    nickname = CharField(max_length=20, null=True)
+    password = PasswordField()
 
     # time
     register_time = DateTimeField(
@@ -17,8 +17,8 @@ class admin(baseModel):
         help_text=u'注册时间')
 
     # permissions
-    isStaff = BooleanField(default=False, help_text=u'是否能登陆至仪表盘')
-    isAdmin = BooleanField(default=False, help_text=u'是否能具有管理员权限')
+    isStaff = BooleanField(default=False)
+    isAdmin = BooleanField(default=False)
 
     def authPassword(self, password):
         return self.password.check_password(password)
