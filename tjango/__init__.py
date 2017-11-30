@@ -7,6 +7,6 @@ from tjango.utils.version import get_version
 # is zero for an official release, positive for a development branch,
 # or negative for a release candidate or beta (after the base version
 # number has been incremented)
-VERSION = (0, 1, 0, 'alpha', 1)
+VERSION = (0, 1, 1, 'beta', 1)
 
 __version__ = get_version(VERSION)
